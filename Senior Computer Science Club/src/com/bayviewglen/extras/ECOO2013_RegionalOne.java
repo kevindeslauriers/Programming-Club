@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
-public class ReadingFromAFile {
+public class ECOO2013_RegionalOne {
 
 	public static void main(String[] args) throws FileNotFoundException {
 		Scanner scanner = new Scanner(new File("data/DATA10.txt"));
@@ -33,10 +33,6 @@ public class ReadingFromAFile {
 				leftToServe = 0;
 			}
 		}
-		
-		
-		
-		
 	}
 
 }
