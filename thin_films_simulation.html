@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thin Film Interference - AP Physics Simulation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #a0a0a0;
+            font-size: 1.2em;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .simulation-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .canvas-container {
+            position: relative;
+            background: #000;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+        }
+
+        .controls-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .control-group {
+            margin-bottom: 25px;
+        }
+
+        .control-group h3 {
+            color: #4ecdc4;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            border-bottom: 2px solid rgba(78, 205, 196, 0.3);
+            padding-bottom: 8px;
+        }
+
+        .slider-container {
+            margin-bottom: 20px;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .slider-label span:first-child {
+            font-weight: 500;
+        }
+
+        .slider-value {
+            background: rgba(78, 205, 196, 0.2);
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            color: #4ecdc4;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #4ecdc4, #45b7d1);
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(78, 205, 196, 0.5);
+            transition: transform 0.2s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: linear-gradient(45deg, #4ecdc4, #45b7d1);
+            color: #fff;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(78, 205, 196, 0.4);
+        }
+
+        button.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        button.secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .info-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .info-panel h2 {
+            color: #ff6b6b;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .formula-box {
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 4px solid #4ecdc4;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .formula {
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+            color: #4ecdc4;
+            margin: 10px 0;
+        }
+
+        .condition-box {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .condition-box {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .condition {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .condition.constructive {
+            border-left: 4px solid #4ecdc4;
+        }
+
+        .condition.destructive {
+            border-left: 4px solid #ff6b6b;
+        }
+
+        .condition h4 {
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .constructive h4 {
+            color: #4ecdc4;
+        }
+
+        .destructive h4 {
+            color: #ff6b6b;
+        }
+
+        .results-display {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            color: #a0a0a0;
+        }
+
+        .result-value {
+            font-weight: bold;
+            color: #4ecdc4;
+        }
+
+        .color-preview {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 10px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 8px 8px 0 0;
+            color: #a0a0a0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            background: rgba(78, 205, 196, 0.3);
+            color: #4ecdc4;
+        }
+
+        .tab:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .legend {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .phase-shift-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #a0a0a0;
+            font-size: 0.9em;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .live-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background: #4ecdc4;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌈 Thin Film Interference</h1>
+            <p class="subtitle">AP Physics Interactive Simulation</p>
+        </header>
+
+        <div class="main-content">
+            <div class="simulation-panel">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h2 style="color: #45b7d1;">Visualization</h2>
+                    <div><span class="live-indicator"></span>Live Simulation</div>
+                </div>
+                
+                <div class="canvas-container">
+                    <canvas id="simulationCanvas" width="600" height="400"></canvas>
+                </div>
+
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #ff6b6b;"></div>
+                        <span>Incident Light</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #4ecdc4;"></div>
+                        <span>Reflected (Top)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #45b7d1;"></div>
+                        <span>Reflected (Bottom)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #ffd93d;"></div>
+                        <span>Transmitted</span>
+                    </div>
+                </div>
+
+                <div class="results-display">
+                    <h3 style="color: #ffd93d; margin-bottom: 15px;">Interference Results</h3>
+                    <div class="result-item">
+                        <span class="result-label">Path Difference:</span>
+                        <span class="result-value" id="pathDiff">0 nm</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Phase Shift:</span>
+                        <span class="result-value" id="phaseShift">0°</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Interference Type:</span>
+                        <span class="result-value" id="interferenceType">-</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Observed Color:</span>
+                        <span class="result-value">
+                            <span id="colorName">-</span>
+                            <div class="color-preview" id="colorPreview"></div>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="controls-panel">
+                <h2 style="color: #96ceb4; margin-bottom: 20px;">Controls</h2>
+                
+                <div class="control-group">
+                    <h3>Film Properties</h3>
+                    
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>Film Thickness (t)</span>
+                            <span class="slider-value" id="thicknessValue">100 nm</span>
+                        </div>
+                        <input type="range" id="thickness" min="10" max="1000" value="100" step="10">
+                    </div>
+
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>Film Index (n₂)</span>
+                            <span class="slider-value" id="indexValue">1.50</span>
+                        </div>
+                        <input type="range" id="refractiveIndex" min="1.00" max="3.00" value="1.50" step="0.01">
+                    </div>
+
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>Angle of Incidence (θ)</span>
+                            <span class="slider-value" id="angleValue">0°</span>
+                        </div>
+                        <input type="range" id="angle" min="0" max="80" value="0" step="1">
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h3>Light Source</h3>
+                    
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>Wavelength (λ)</span>
+                            <span class="slider-value" id="wavelengthValue">550 nm</span>
+                        </div>
+                        <input type="range" id="wavelength" min="380" max="750" value="550" step="10">
+                    </div>
+
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>Medium 1 Index (n₁)</span>
+                            <span class="slider-value" id="n1Value">1.00</span>
+                        </div>
+                        <input type="range" id="n1" min="1.00" max="2.00" value="1.00" step="0.01">
+                    </div>
+
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>Medium 3 Index (n₃)</span>
+                            <span class="slider-value" id="n3Value">1.00</span>
+                        </div>
+                        <input type="range" id="n3" min="1.00" max="3.00" value="1.00" step="0.01">
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h3>Display Options</h3>
+                    
+                    <div class="button-group">
+                        <button id="toggleWaves">Toggle Wave View</button>
+                        <button id="toggleRays" class="secondary">Toggle Ray View</button>
+                        <button id="resetSim" class="secondary">Reset</button>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h3>Quick Presets</h3>
+                    
+                    <div class="button-group">
+                        <button class="secondary" onclick="applyPreset('soap')">Soap Bubble</button>
+                        <button class="secondary" onclick="applyPreset('oil')">Oil Slick</button>
+                        <button class="secondary" onclick="applyPreset('coating')">Anti-Reflective</button>
+                        <button class="secondary" onclick="applyPreset('custom')">Custom</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-panel">
+            <h2>📚 Physics Concepts</h2>
+            
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('basics')">Basics</button>
+                <button class="tab" onclick="switchTab('formulas')">Formulas</button>
+                <button class="tab" onclick="switchTab('phases')">Phase Shifts</button>
+                <button class="tab" onclick="switchTab('applications')">Applications</button>
+            </div>
+
+            <div id="basics" class="tab-content active">
+                <p><strong>Thin film interference</strong> occurs when light waves reflect off the top and bottom surfaces of a thin film, creating interference patterns. This phenomenon is responsible for the colorful patterns seen in soap bubbles, oil slicks, and anti-reflective coatings.</p>
+                
+                <p style="margin-top: 15px;">When light strikes a thin film:</p>
+                <ul style="margin: 15px 0 15px 30px; line-height: 1.8;">
+                    <li>Some light reflects off the top surface</li>
+                    <li>Some light enters the film and reflects off the bottom surface</li>
+                    <li>The two reflected waves interfere with each other</li>
+                    <li>Constructive interference creates bright colors</li>
+                    <li>Destructive interference creates dark regions</li>
+                </ul>
+            </div>
+
+            <div id="formulas" class="tab-content">
+                <div class="formula-box">
+                    <h4 style="color: #4ecdc4; margin-bottom: 10px;">Key Equations</h4>
+                    
+                    <div class="formula">
+                        Path Difference: Δ = 2nt cos(θ₂)
+                    </div>
+                    
+                    <div class="formula">
+                        Snell's Law: n₁ sin(θ₁) = n₂ sin(θ₂)
+                    </div>
+                </div>
+
+                <div class="condition-box">
+                    <div class="condition constructive">
+                        <h4>✨ Constructive Interference</h4>
+                        <div class="formula">2nt cos(θ₂) = (m + ½)λ</div>
+                        <p style="font-size: 0.9em; color: #a0a0a0; margin-top: 10px;">
+                            Bright reflection (when one phase shift occurs)
+                        </p>
+                    </div>
+                    
+                    <div class="condition destructive">
+                        <h4>🌑 Destructive Interference</h4>
+                        <div class="formula">2nt cos(θ₂) = mλ</div>
+                        <p style="font-size: 0.9em; color: #a0a0a0; margin-top: 10px;">
+                            Dark reflection (when one phase shift occurs)
+                        </p>
+                    </div>
+                </div>
+
+                <p style="margin-top: 15px; font-size: 0.9em; color: #a0a0a0;">
+                    Where: m = 0, 1, 2, ... (order number), n = refractive index, t = thickness, θ₂ = angle in film
+                </p>
+            </div>
+
+            <div id="phases" class="tab-content">
+                <h3 style="color: #ff6b6b; margin-bottom: 15px;">Phase Shift Rules</h3>
+                
+                <p>A <strong>180° phase shift</strong> (π radians) occurs when light reflects from a medium with a <strong>higher</strong> refractive index.</p>
+
+                <div style="margin-top: 20px;">
+                    <div class="condition-box">
+                        <div class="condition">
+                            <h4><span class="phase-shift-indicator" style="background: #4ecdc4;"></span>n₁ < n₂</h4>
+                            <p style="font-size: 0.9em; color: #a0a0a0;">
+                                Phase shift occurs at top surface reflection
+                            </p>
+                        </div>
+                        
+                        <div class="condition">
+                            <h4><span class="phase-shift-indicator" style="background: #ff6b6b;"></span>n₁ > n₂</h4>
+                            <p style="font-size: 0.9em; color: #a0a0a0;">
+                                No phase shift at top surface reflection
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <div class="condition-box">
+                        <div class="condition">
+                            <h4><span class="phase-shift-indicator" style="background: #4ecdc4;"></span>n₂ < n₃</h4>
+                            <p style="font-size: 0.9em; color: #a0a0a0;">
+                                Phase shift occurs at bottom surface reflection
+                            </p>
+                        </div>
+                        
+                        <div class="condition">
+                            <h4><span class="phase-shift-indicator" style="background: #ff6b6b;"></span>n₂ > n₃</h4>
+                            <p style="font-size: 0.9em; color: #a0a0a0;">
+                                No phase shift at bottom surface reflection
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="formula-box" style="margin-top: 20px;">
+                    <h4 style="color: #ffd93d;">Important Cases</h4>
+                    <ul style="margin: 10px 0 0 20px; line-height: 2;">
+                        <li><strong>One phase shift:</strong> Conditions reverse (constructive ↔ destructive)</li>
+                        <li><strong>Zero or two phase shifts:</strong> Standard conditions apply</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="applications" class="tab-content">
+                <h3 style="color: #96ceb4; margin-bottom: 15px;">Real-World Applications</h3>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 20px;">
+                    <div class="condition">
+                        <h4>🫧 Soap Bubbles</h4>
+                        <p style="font-size: 0.9em; color: #a0a0a0; margin-top: 10px;">
+                            Colorful patterns from varying film thickness creating different interference conditions for different wavelengths.
+                        </p>
+                    </div>
+                    
+                    <div class="condition">
+                        <h4>🛢️ Oil Slicks</h4>
+                        <p style="font-size: 0.9em; color: #a0a0a0; margin-top: 10px;">
+                            Rainbow patterns on water surfaces from thin oil films with thickness comparable to light wavelengths.
+                        </p>
+                    </div>
+                    
+                    <div class="condition">
+                        <h4>📷 Anti-Reflective Coatings</h4>
+                        <p style="font-size: 0.9em; color: #a0a0a0; margin-top: 10px;">
+                            Engineered thin films on lenses to cause destructive interference of reflected light, reducing glare.
+                        </p>
+                    </div>
+                    
+                    <div class="condition">
+                        <h4>🪞 Optical Filters</h4>
+                        <p style="font-size: 0.9em; color: #a0a0a0; margin-top: 10px;">
+                            Precise thin film stacks used to selectively transmit or reflect specific wavelengths.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Thin Film Interference Simulation | AP Physics Educational Tool</p>
+            <p style="margin-top: 5px;">Interactive learning experience for understanding wave optics</p>
+        </div>
+    </div>
+
+    <script>
+        // Canvas setup
+        const canvas = document.getElementById('simulationCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        // State variables
+        let state = {
+            thickness: 100,
+            refractiveIndex: 1.50,
+            angle: 0,
+            wavelength: 550,
+            n1: 1.00,
+            n3: 1.00,
+            showWaves: true,
+            showRays: true,
+            time: 0
+        };
+
+        // DOM elements
+        const sliders = {
+            thickness: document.getElementById('thickness'),
+            refractiveIndex: document.getElementById('refractiveIndex'),
+            angle: document.getElementById('angle'),
+            wavelength: document.getElementById('wavelength'),
+            n1: document.getElementById('n1'),
+            n3: document.getElementById('n3')
+        };
+
+        const displays = {
+            thickness: document.getElementById('thicknessValue'),
+            refractiveIndex: document.getElementById('indexValue'),
+            angle: document.getElementById('angleValue'),
+            wavelength: document.getElementById('wavelengthValue'),
+            n1: document.getElementById('n1Value'),
+            n3: document.getElementById('n3Value')
+        };
+
+        // Wavelength to RGB conversion
+        function wavelengthToRGB(wavelength) {
+            let r, g, b;
+            
+            if (wavelength >= 380 && wavelength < 440) {
+                r = -(wavelength - 440) / (440 - 380);
+                g = 0;
+                b = 1;
+            } else if (wavelength >= 440 && wavelength < 490) {
+                r = 0;
+                g = (wavelength - 440) / (490 - 440);
+                b = 1;
+            } else if (wavelength >= 490 && wavelength < 510) {
+                r = 0;
+                g = 1;
+                b = -(wavelength - 510) / (510 - 490);
+            } else if (wavelength >= 510 && wavelength < 580) {
+                r = (wavelength - 510) / (580 - 510);
+                g = 1;
+                b = 0;
+            } else if (wavelength >= 580 && wavelength < 645) {
+                r = 1;
+                g = -(wavelength - 645) / (645 - 580);
+                b = 0;
+            } else if (wavelength >= 645 && wavelength <= 750) {
+                r = 1;
+                g = 0;
+                b = 0;
+            } else {
+                r = g = b = 0;
+            }
+            
+            // Intensity adjustment
+            let factor;
+            if (wavelength > 700) {
+                factor = 0.3 + 0.7 * (750 - wavelength) / (750 - 700);
+            } else if (wavelength < 420) {
+                factor = 0.3 + 0.7 * (wavelength - 380) / (420 - 380);
+            } else {
+                factor = 1;
+            }
+            
+            return {
+                r: Math.round(r * factor * 255),
+                g: Math.round(g * factor * 255),
+                b: Math.round(b * factor * 255)
+            };
+        }
+
+        function rgbToString(rgb) {
+            return `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+        }
+
+        // Calculate interference
+        function calculateInterference() {
+            const { thickness, refractiveIndex, angle, wavelength, n1, n3 } = state;
+            
+            // Convert angle to radians
+            const theta1 = angle * Math.PI / 180;
+            
+            // Snell's law: n1 * sin(theta1) = n2 * sin(theta2)
+            const sinTheta2 = (n1 * Math.sin(theta1)) / refractiveIndex;
+            const theta2 = Math.asin(Math.min(1, sinTheta2));
+            const cosTheta2 = Math.cos(theta2);
+            
+            // Path difference: 2 * n * t * cos(theta2)
+            const pathDifference = 2 * refractiveIndex * thickness * cosTheta2;
+            
+            // Phase shifts
+            let phaseShiftTop = n1 < refractiveIndex ? Math.PI : 0;
+            let phaseShiftBottom = refractiveIndex < n3 ? Math.PI : 0;
+            let totalPhaseShift = phaseShiftTop + phaseShiftBottom;
+            
+            // Net phase difference
+            const phaseFromPath = (2 * Math.PI * pathDifference) / wavelength;
+            const netPhase = phaseFromPath + totalPhaseShift;
+            
+            // Interference intensity (normalized)
+            const intensity = Math.cos(netPhase / 2) ** 2;
+            
+            // Determine interference type
+            const normalizedPhase = netPhase % (2 * Math.PI);
+            let interferenceType;
+            if (intensity > 0.8) {
+                interferenceType = "Constructive (Bright)";
+            } else if (intensity < 0.2) {
+                interferenceType = "Destructive (Dark)";
+            } else {
+                interferenceType = "Partial";
+            }
+            
+            // Calculate observed color
+            const rgb = wavelengthToRGB(wavelength);
+            const adjustedRgb = {
+                r: Math.round(rgb.r * intensity),
+                g: Math.round(rgb.g * intensity),
+                b: Math.round(rgb.b * intensity)
+            };
+            
+            // Get color name
+            const colorName = getColorName(wavelength, intensity);
+            
+            return {
+                pathDifference,
+                phaseShift: totalPhaseShift * 180 / Math.PI,
+                interferenceType,
+                intensity,
+                color: adjustedRgb,
+                colorName,
+                theta2: theta2 * 180 / Math.PI
+            };
+        }
+
+        function getColorName(wavelength, intensity) {
+            if (intensity < 0.2) return "Dark";
+            
+            if (wavelength < 420) return "Violet";
+            if (wavelength < 450) return "Blue-Violet";
+            if (wavelength < 485) return "Blue";
+            if (wavelength < 500) return "Cyan";
+            if (wavelength < 520) return "Green";
+            if (wavelength < 565) return "Yellow-Green";
+            if (wavelength < 590) return "Yellow";
+            if (wavelength < 625) return "Orange";
+            if (wavelength < 700) return "Red";
+            return "Deep Red";
+        }
+
+        // Draw simulation
+        function draw() {
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            const results = calculateInterference();
+            const { thickness, refractiveIndex, angle, wavelength, n1, n3 } = state;
+            
+            // Draw layers
+            const layerHeights = [100, 150 + thickness * 0.15, 350];
+            
+            // Medium 1 (top)
+            const gradient1 = ctx.createLinearGradient(0, 0, 0, layerHeights[0]);
+            gradient1.addColorStop(0, 'rgba(100, 149, 237, 0.3)');
+            gradient1.addColorStop(1, 'rgba(100, 149, 237, 0.1)');
+            ctx.fillStyle = gradient1;
+            ctx.fillRect(0, 0, canvas.width, layerHeights[0]);
+            
+            // Film (middle)
+            const gradientFilm = ctx.createLinearGradient(0, layerHeights[0], 0, layerHeights[1]);
+            gradientFilm.addColorStop(0, `rgba(78, 205, 196, ${0.3 + refractiveIndex * 0.1})`);
+            gradientFilm.addColorStop(1, `rgba(69, 183, 209, ${0.3 + refractiveIndex * 0.1})`);
+            ctx.fillStyle = gradientFilm;
+            ctx.fillRect(0, layerHeights[0], canvas.width, layerHeights[1] - layerHeights[0]);
+            
+            // Medium 3 (bottom)
+            const gradient3 = ctx.createLinearGradient(0, layerHeights[1], 0, layerHeights[2]);
+            gradient3.addColorStop(0, 'rgba(150, 206, 180, 0.1)');
+            gradient3.addColorStop(1, 'rgba(150, 206, 180, 0.3)');
+            ctx.fillStyle = gradient3;
+            ctx.fillRect(0, layerHeights[1], canvas.width, canvas.height - layerHeights[1]);
+            
+            // Draw boundaries
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(0, layerHeights[0]);
+            ctx.lineTo(canvas.width, layerHeights[0]);
+            ctx.moveTo(0, layerHeights[1]);
+            ctx.lineTo(canvas.width, layerHeights[1]);
+            ctx.stroke();
+            
+            // Labels
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+            ctx.font = '14px Arial';
+            ctx.fillText(`n₁ = ${n1.toFixed(2)}`, 20, 50);
+            ctx.fillText(`n₂ = ${refractiveIndex.toFixed(2)} (film)`, 20, layerHeights[0] + 30);
+            ctx.fillText(`n₃ = ${n3.toFixed(2)}`, 20, layerHeights[1] + 50);
+            ctx.fillText(`t = ${thickness} nm`, canvas.width - 120, layerHeights[0] + (layerHeights[1] - layerHeights[0]) / 2);
+            
+            if (state.showRays) {
+                drawRays(layerHeights, results);
+            }
+            
+            if (state.showWaves) {
+                drawWaves(layerHeights, results);
+            }
+            
+            // Update results display
+            updateResults(results);
+        }
+
+        function drawRays(layers, results) {
+            const centerX = canvas.width / 3;
+            const incidentY = 50;
+            const theta1 = state.angle * Math.PI / 180;
+            
+            // Incident ray
+            ctx.strokeStyle = '#ff6b6b';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(centerX - 100, incidentY);
+            ctx.lineTo(centerX, layers[0]);
+            ctx.stroke();
+            
+            // Arrow on incident ray
+            drawArrow(ctx, centerX - 50, incidentY + 25, theta1);
+            
+            // Reflected ray (top surface)
+            ctx.strokeStyle = '#4ecdc4';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(centerX, layers[0]);
+            ctx.lineTo(centerX + 100, incidentY);
+            ctx.stroke();
+            
+            // Arrow on reflected ray
+            drawArrow(ctx, centerX + 50, incidentY + 25, -theta1);
+            
+            // Refracted ray in film
+            const theta2 = results.theta2 * Math.PI / 180;
+            ctx.strokeStyle = '#45b7d1';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(centerX, layers[0]);
+            const filmBottomX = centerX + Math.tan(theta2) * (layers[1] - layers[0]);
+            ctx.lineTo(filmBottomX, layers[1]);
+            ctx.stroke();
+            
+            // Reflected ray from bottom
+            ctx.strokeStyle = '#45b7d1';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(filmBottomX, layers[1]);
+            const topX = filmBottomX + Math.tan(theta2) * (layers[1] - layers[0]);
+            ctx.lineTo(topX, layers[0]);
+            ctx.stroke();
+            
+            // Transmitted ray
+            ctx.strokeStyle = '#ffd93d';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(filmBottomX, layers[1]);
+            ctx.lineTo(filmBottomX + 80, layers[1] + 80);
+            ctx.stroke();
+            
+            // Second reflected ray (exiting)
+            ctx.strokeStyle = '#45b7d1';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.moveTo(topX, layers[0]);
+            ctx.lineTo(topX + 100, incidentY);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+
+        function drawArrow(ctx, x, y, angle) {
+            const arrowSize = 8;
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(angle);
+            ctx.beginPath();
+            ctx.moveTo(-5, 0);
+            ctx.lineTo(5, 0);
+            ctx.lineTo(0, -arrowSize);
+            ctx.lineTo(0, arrowSize);
+            ctx.closePath();
+            ctx.fillStyle = ctx.strokeStyle;
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function drawWaves(layers, results) {
+            const time = state.time;
+            const wavelength = state.wavelength;
+            const k = 2 * Math.PI / (wavelength * 0.5); // Scale for visualization
+            
+            // Draw wave on incident ray
+            drawWaveOnPath(ctx, {x1: canvas.width / 3 - 100, y1: 50, x2: canvas.width / 3, y2: layers[0]}, 
+                          wavelength, time, '#ff6b6b', 0);
+            
+            // Draw wave on reflected ray
+            drawWaveOnPath(ctx, {x1: canvas.width / 3, y1: layers[0], x2: canvas.width / 3 + 100, y2: 50}, 
+                          wavelength, time, '#4ecdc4', 0);
+            
+            // Draw wave on second reflected ray with phase
+            const phase = results.pathDifference / wavelength * 2 * Math.PI;
+            drawWaveOnPath(ctx, {x1: canvas.width / 3 + 50, y1: layers[0], x2: canvas.width / 3 + 150, y2: 50}, 
+                          wavelength, time, '#45b7d1', phase);
+        }
+
+        function drawWaveOnPath(ctx, path, wavelength, time, color, phaseOffset) {
+            const {x1, y1, x2, y2} = path;
+            const dx = x2 - x1;
+            const dy = y2 - y1;
+            const length = Math.sqrt(dx * dx + dy * dy);
+            const angle = Math.atan2(dy, dx);
+            
+            ctx.save();
+            ctx.translate(x1, y1);
+            ctx.rotate(angle);
+            
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            
+            const amplitude = 15;
+            const waveK = 2 * Math.PI / (wavelength * 0.3);
+            
+            for (let x = 0; x < length; x += 2) {
+                const y = Math.sin(waveK * x - time * 5 + phaseOffset) * amplitude * (1 - x / length * 0.5);
+                if (x === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            }
+            
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        function updateResults(results) {
+            document.getElementById('pathDiff').textContent = `${results.pathDifference.toFixed(1)} nm`;
+            document.getElementById('phaseShift').textContent = `${results.phaseShift.toFixed(0)}°`;
+            document.getElementById('interferenceType').textContent = results.interferenceType;
+            document.getElementById('colorName').textContent = results.colorName;
+            
+            const colorPreview = document.getElementById('colorPreview');
+            colorPreview.style.background = rgbToString(results.color);
+            
+            // Color code the interference type
+            const typeElement = document.getElementById('interferenceType');
+            if (results.interferenceType.includes('Constructive')) {
+                typeElement.style.color = '#4ecdc4';
+            } else if (results.interferenceType.includes('Destructive')) {
+                typeElement.style.color = '#ff6b6b';
+            } else {
+                typeElement.style.color = '#ffd93d';
+            }
+        }
+
+        // Animation loop
+        function animate() {
+            state.time += 0.016;
+            draw();
+            requestAnimationFrame(animate);
+        }
+
+        // Event listeners
+        Object.keys(sliders).forEach(key => {
+            sliders[key].addEventListener('input', (e) => {
+                state[key] = parseFloat(e.target.value);
+                displays[key].textContent = key === 'angle' ? `${state[key]}°` : 
+                                           key === 'thickness' ? `${state[key]} nm` :
+                                           key === 'wavelength' ? `${state[key]} nm` :
+                                           state[key].toFixed(2);
+            });
+        });
+
+        // Toggle buttons
+        document.getElementById('toggleWaves').addEventListener('click', () => {
+            state.showWaves = !state.showWaves;
+        });
+
+        document.getElementById('toggleRays').addEventListener('click', () => {
+            state.showRays = !state.showRays;
+        });
+
+        document.getElementById('resetSim').addEventListener('click', () => {
+            state = {
+                thickness: 100,
+                refractiveIndex: 1.50,
+                angle: 0,
+                wavelength: 550,
+                n1: 1.00,
+                n3: 1.00,
+                showWaves: true,
+                showRays: true,
+                time: 0
+            };
+            
+            Object.keys(sliders).forEach(key => {
+                sliders[key].value = state[key];
+                displays[key].textContent = key === 'angle' ? `${state[key]}°` : 
+                                           key === 'thickness' ? `${state[key]} nm` :
+                                           key === 'wavelength' ? `${state[key]} nm` :
+                                           state[key].toFixed(2);
+            });
+        });
+
+        // Presets
+        function applyPreset(preset) {
+            switch(preset) {
+                case 'soap':
+                    state.thickness = 300;
+                    state.refractiveIndex = 1.33;
+                    state.n1 = 1.00;
+                    state.n3 = 1.00;
+                    state.wavelength = 550;
+                    break;
+                case 'oil':
+                    state.thickness = 500;
+                    state.refractiveIndex = 1.47;
+                    state.n1 = 1.00;
+                    state.n3 = 1.33;
+                    state.wavelength = 600;
+                    break;
+                case 'coating':
+                    state.thickness = 100;
+                    state.refractiveIndex = 1.38;
+                    state.n1 = 1.00;
+                    state.n3 = 1.52;
+                    state.wavelength = 550;
+                    break;
+                case 'custom':
+                    state.thickness = 100;
+                    state.refractiveIndex = 1.50;
+                    state.n1 = 1.00;
+                    state.n3 = 1.00;
+                    state.wavelength = 550;
+                    break;
+            }
+            
+            Object.keys(sliders).forEach(key => {
+                sliders[key].value = state[key];
+                displays[key].textContent = key === 'angle' ? `${state[key]}°` : 
+                                           key === 'thickness' ? `${state[key]} nm` :
+                                           key === 'wavelength' ? `${state[key]} nm` :
+                                           state[key].toFixed(2);
+            });
+        }
+
+        // Tab switching
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        // Initialize
+        animate();
+    </script>
+</body>
+</html>
